@@ -1,0 +1,334 @@
+Parameters:
+  prefix:
+    Type: String
+    Description: Prefix name for the resources
+    Default: vpc-gw
+  vpcCidrBlock:
+    Type: String
+    Description: VPC IP Cidr Block
+  subnet1CidrBlock:
+    Type: String
+    Description: Subnet 1 IP Cidr Block
+  subnet2CidrBlock:
+    Type: String
+    Description: Subnet 2 IP Cidr Block
+  subnet3CidrBlock:
+    Type: String
+    Description: Subnet 3 IP Cidr Block
+  subnet4CidrBlock:
+    Type: String
+    Description: Subnet 4 IP Cidr Block
+  subnet5CidrBlock:
+    Type: String
+    Description: Subnet 5 IP Cidr Block
+  subnet6CidrBlock:
+    Type: String
+    Description: Subnet 6 IP Cidr Block
+  subnet7CidrBlock:
+    Type: String
+    Description: Subnet 7 IP Cidr Block
+  subnet8CidrBlock:
+    Type: String
+    Description: Subnet 8 IP Cidr Block
+  vpcCidrRange:
+    Type: String
+    Description: VPC IP Range
+    Default: 16
+  subnetCidrRange:
+    Type: String
+    Description: Subnet IP Range
+    Default: 24
+  createNatGateway:
+    Type: String
+    Description: Flag to create NatGateway
+    Default: false
+    AllowedValues:
+      - true
+      - false
+
+Conditions:
+  EnabledNatGateway: !Equals [ !Ref createNatGateway, 'true' ]
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Join ["/", [!Ref vpcCidrBlock, !Ref vpcCidrRange]]
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "vpc"]]
+  
+  DMZSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName:  !Join ['-', [!Ref prefix, 'dmz-sg']]
+      GroupDescription: DMZ Security Group to allow Access to SSH
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - Description: Allow SSH
+          IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+  
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet1CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet1"]]
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet2CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet2"]]
+  
+  Subnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet3CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet3"]]
+  
+  Subnet4:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet4CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet4"]]
+  
+  Subnet5:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet5CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet5"]]
+  
+  Subnet6:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet6CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet6"]]
+  
+  Subnet7:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet7CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet7"]]
+  
+  Subnet8:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs 
+          Ref: 'AWS::Region'
+      CidrBlock: !Join ["/", [!Ref subnet8CidrBlock, !Ref subnetCidrRange]]
+      Tags:
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "subnet8"]]
+  
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "ig"]]
+  
+  VpcIgAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  
+  PublicRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags: 
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "public", "table"]]
+  
+  PrivateRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags: 
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "private", "table"]]
+
+  RouteIG:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRT
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+  
+  RouteSubnet1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRT
+      SubnetId: !Ref Subnet1
+  
+  RouteSubnet2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRT
+      SubnetId: !Ref Subnet2
+
+  RouteSubnet3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet3
+  
+  RouteSubnet4:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet4
+  
+  RouteSubnet5:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet5
+  
+  RouteSubnet6:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet6
+  
+  RouteSubnet7:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet7
+  
+  RouteSubnet8:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRT
+      SubnetId: !Ref Subnet8
+  
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Condition: EnabledNatGateway
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Condition: EnabledNatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP.AllocationId
+      SubnetId: !Ref Subnet1
+
+  RouteNatGateway:
+    Type: AWS::EC2::Route
+    DependsOn: [ NatGateway ]
+    Condition: EnabledNatGateway
+    Properties:
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway
+      RouteTableId: !Ref PrivateRT
+
+Outputs:
+  VPCId:
+      Value: !Ref VPC
+      Export:
+        Name: !Sub "${AWS::StackName}-vpc-id"
+
+  Subnet1Id:
+    Value: !Ref Subnet1
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet1-id"
+  
+  Subnet2Id:
+    Value: !Ref Subnet2
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet2-id"
+    
+  Subnet3Id:
+    Value: !Ref Subnet3
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet3-id"
+    
+  Subnet4Id:
+    Value: !Ref Subnet4
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet4-id"
+  
+  Subnet5Id:
+    Value: !Ref Subnet5
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet5-id"
+  
+  Subnet6Id:
+    Value: !Ref Subnet6
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet6-id"
+    
+  Subnet7Id:
+    Value: !Ref Subnet7
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet7-id"
+    
+  Subnet8Id:
+    Value: !Ref Subnet8
+    Export:
+      Name: !Sub "${AWS::StackName}-subnet8-id"
+
+  DMZSecurityGroup:
+    Value: !Ref DMZSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-dmz-sg"
