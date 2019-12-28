@@ -4,7 +4,7 @@
 
 ## Description
 
-Example of that creates a VPC with 8 subnets in two different Availability Zones with the option to create a NatGateway
+Example that creates a VPC with 8 subnets in two different Availability Zones with the option to create a NatGateway
 
 
 
