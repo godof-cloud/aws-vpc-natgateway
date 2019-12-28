@@ -1,4 +1,4 @@
-# VPC with NatGatewat
+# VPC with NatGateway
 
 
 
