@@ -18,18 +18,6 @@ Parameters:
   subnet4CidrBlock:
     Type: String
     Description: Subnet 4 IP Cidr Block
-  subnet5CidrBlock:
-    Type: String
-    Description: Subnet 5 IP Cidr Block
-  subnet6CidrBlock:
-    Type: String
-    Description: Subnet 6 IP Cidr Block
-  subnet7CidrBlock:
-    Type: String
-    Description: Subnet 7 IP Cidr Block
-  subnet8CidrBlock:
-    Type: String
-    Description: Subnet 8 IP Cidr Block
   vpcCidrRange:
     Type: String
     Description: VPC IP Range
@@ -124,58 +112,6 @@ Resources:
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "subnet4"]]
   
-  Subnet5:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select 
-        - 0
-        - !GetAZs 
-          Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet5CidrBlock, !Ref subnetCidrRange]]
-      Tags:
-        - Key: "Name"
-          Value: !Join ["-", [!Ref prefix, "subnet5"]]
-  
-  Subnet6:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select 
-        - 1
-        - !GetAZs 
-          Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet6CidrBlock, !Ref subnetCidrRange]]
-      Tags:
-        - Key: "Name"
-          Value: !Join ["-", [!Ref prefix, "subnet6"]]
-  
-  Subnet7:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select 
-        - 0
-        - !GetAZs 
-          Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet7CidrBlock, !Ref subnetCidrRange]]
-      Tags:
-        - Key: "Name"
-          Value: !Join ["-", [!Ref prefix, "subnet7"]]
-  
-  Subnet8:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref VPC
-      AvailabilityZone: !Select 
-        - 1
-        - !GetAZs 
-          Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet8CidrBlock, !Ref subnetCidrRange]]
-      Tags:
-        - Key: "Name"
-          Value: !Join ["-", [!Ref prefix, "subnet8"]]
-  
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
@@ -236,30 +172,6 @@ Resources:
       RouteTableId: !Ref PrivateRT
       SubnetId: !Ref Subnet4
   
-  RouteSubnet5:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRT
-      SubnetId: !Ref Subnet5
-  
-  RouteSubnet6:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRT
-      SubnetId: !Ref Subnet6
-  
-  RouteSubnet7:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRT
-      SubnetId: !Ref Subnet7
-  
-  RouteSubnet8:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      RouteTableId: !Ref PrivateRT
-      SubnetId: !Ref Subnet8
-  
   ElasticIP:
     Type: AWS::EC2::EIP
     Condition: EnabledNatGateway
@@ -307,26 +219,6 @@ Outputs:
     Value: !Ref Subnet4
     Export:
       Name: !Sub "${AWS::StackName}-subnet4-id"
-  
-  Subnet5Id:
-    Value: !Ref Subnet5
-    Export:
-      Name: !Sub "${AWS::StackName}-subnet5-id"
-  
-  Subnet6Id:
-    Value: !Ref Subnet6
-    Export:
-      Name: !Sub "${AWS::StackName}-subnet6-id"
-    
-  Subnet7Id:
-    Value: !Ref Subnet7
-    Export:
-      Name: !Sub "${AWS::StackName}-subnet7-id"
-    
-  Subnet8Id:
-    Value: !Ref Subnet8
-    Export:
-      Name: !Sub "${AWS::StackName}-subnet8-id"
 
   DMZSecurityGroup:
     Value: !Ref DMZSecurityGroup
