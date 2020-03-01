@@ -1,12 +1,10 @@
 # VPC with NatGateway
 
-
-
 ## Description
 
-Example that creates a VPC with 8 subnets in two different Availability Zones with the option to create a NatGateway
+Example that creates a VPC with 4 subnets in two different Availability Zones with the option to create a NatGateway.
 
-
+You can find the full explanation of this template in: [https://godof.cloud/vpc-with-nat-gateway/](https://godof.cloud/vpc-with-nat-gateway/)
 
 ## Architecture
 
@@ -16,7 +14,7 @@ The cloudformation template will build the following resources:
 
 - Security Group
 
-- 8 Subnets
+- 4 Subnets
 
 - Internet Gateway
 
@@ -26,36 +24,20 @@ The cloudformation template will build the following resources:
 
 - NatGateway (optional)
 
-
-
 ## Content
 
 - cloudformation.yml: Cloudformation template that builds all the AWS resources. The template expects the following parameters:
   
-  - prefix: A prefix that will be set in the name of all the resources to be sure that all the names used are unique, by default vpc-gw
+  - prefix: This value will be appended in the resource's name that we are going to create to be sure that there is any conflict with other resources that you might have, by default is *custom*.
   
-  - vpcCidrBlock: IP that will be assigned with the VPC
+  - sgCidr: Custom IP to configure the Security Group to allow access only from the specified IP.
   
-  - subnet1CidrBlock: Subnet 1 IP
+  - vpcCidrBlock: IP block for the VPC network , for example, 10.0.0.0
   
-  - subnet2CidrBlock: Subnet 2 IP
+  - subnetCidrBlocks: IP blocks for the subnets separated by commas, for example, 10.0.1.0, 10.0.2.0, 10.0.3.0, 10.0.4.0
   
-  - subnet3CidrBlock: Subnet 3 IP
+  - vpcCidrRange: IP range for the VPC, by default 16.
   
-  - subnet4CidrBlock: Subnet 4 IP
+  - subnetCidrRange: IP range for the Subnets, by default 24.
   
-  - subnet5CidrBlock: Subnet 5 IP
-  
-  - subnet6CidrBlock: Subnet 6 IP
-  
-  - subnet7CidrBlock: Subnet 7 IP
-  
-  - subnet8CidrBlock: Subnet 8 IP
-  
-  - vpcCidrRange: IP Range for the VPC IP, by default 16
-  
-  - subnetCidrRange: IP Range for the Subnet's IP, by deault 24
-  
-  - createNatGateway: Flag to enable the creation of the NatGateway
-
-
+  - createNatGateway: Flag to decide if the template would create a NatGateway.

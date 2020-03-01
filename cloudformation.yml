@@ -2,22 +2,17 @@ Parameters:
   prefix:
     Type: String
     Description: Prefix name for the resources
-    Default: vpc-gw
+    Default: custom
+  sgCidr:
+    Type: String
+    Description: Custom Security Group IP Cidr Block
+    Default: 0.0.0.0/0
   vpcCidrBlock:
     Type: String
     Description: VPC IP Cidr Block
-  subnet1CidrBlock:
-    Type: String
-    Description: Subnet 1 IP Cidr Block
-  subnet2CidrBlock:
-    Type: String
-    Description: Subnet 2 IP Cidr Block
-  subnet3CidrBlock:
-    Type: String
-    Description: Subnet 3 IP Cidr Block
-  subnet4CidrBlock:
-    Type: String
-    Description: Subnet 4 IP Cidr Block
+  subnetCidrBlocks:
+    Type: List<String>
+    Description: Subnet IPs Cidr Blocks, comma separated
   vpcCidrRange:
     Type: String
     Description: VPC IP Range
@@ -59,6 +54,17 @@ Resources:
           IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
+          CidrIp: !Ref sgCidr
+        - Description: Allow Http
+          IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: !Ref sgCidr
+        - Description: Allow Https
+          IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: !Ref sgCidr
   
   Subnet1:
     Type: AWS::EC2::Subnet
@@ -68,7 +74,7 @@ Resources:
         - 0
         - !GetAZs 
           Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet1CidrBlock, !Ref subnetCidrRange]]
+      CidrBlock: !Join ["/", [!Select [0, !Ref subnetCidrBlocks], !Ref subnetCidrRange]]
       Tags:
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "subnet1"]]
@@ -81,7 +87,7 @@ Resources:
         - 1
         - !GetAZs 
           Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet2CidrBlock, !Ref subnetCidrRange]]
+      CidrBlock: !Join ["/", [!Select [1, !Ref subnetCidrBlocks], !Ref subnetCidrRange]]
       Tags:
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "subnet2"]]
@@ -94,7 +100,7 @@ Resources:
         - 0
         - !GetAZs 
           Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet3CidrBlock, !Ref subnetCidrRange]]
+      CidrBlock: !Join ["/", [!Select [2, !Ref subnetCidrBlocks], !Ref subnetCidrRange]]
       Tags:
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "subnet3"]]
@@ -107,23 +113,10 @@ Resources:
         - 1
         - !GetAZs 
           Ref: 'AWS::Region'
-      CidrBlock: !Join ["/", [!Ref subnet4CidrBlock, !Ref subnetCidrRange]]
+      CidrBlock: !Join ["/", [!Select [3, !Ref subnetCidrBlocks], !Ref subnetCidrRange]]
       Tags:
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "subnet4"]]
-  
-  InternetGateway:
-    Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags: 
-        - Key: "Name"
-          Value: !Join ["-", [!Ref prefix, "ig"]]
-  
-  VpcIgAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      InternetGatewayId: !Ref InternetGateway
-      VpcId: !Ref VPC
   
   PublicRT:
     Type: AWS::EC2::RouteTable
@@ -140,13 +133,6 @@ Resources:
       Tags: 
         - Key: "Name"
           Value: !Join ["-", [!Ref prefix, "private", "table"]]
-
-  RouteIG:
-    Type: AWS::EC2::Route
-    Properties:
-      RouteTableId: !Ref PublicRT
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway
   
   RouteSubnet1:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -171,6 +157,26 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRT
       SubnetId: !Ref Subnet4
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags: 
+        - Key: "Name"
+          Value: !Join ["-", [!Ref prefix, "ig"]]
+  
+  VpcIgAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  RouteIG:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRT
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
   
   ElasticIP:
     Type: AWS::EC2::EIP
