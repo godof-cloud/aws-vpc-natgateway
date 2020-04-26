@@ -12,7 +12,7 @@ Parameters:
     Description: VPC IP Cidr Block
   subnetCidrBlocks:
     Type: List<String>
-    Description: Subnet IPs Cidr Blocks, comma separated
+    Description: 4 Subnet IPs Cidr Blocks, comma separated
   vpcCidrRange:
     Type: String
     Description: VPC IP Range
@@ -225,8 +225,23 @@ Outputs:
     Value: !Ref Subnet4
     Export:
       Name: !Sub "${AWS::StackName}-subnet4-id"
+  
+  PublicRTId:
+    Value: !Ref PublicRT
+    Export:
+      Name: !Sub "${AWS::StackName}-public-rt-id"
+  
+  PrivateRTId:
+    Value: !Ref PrivateRT
+    Export:
+      Name: !Sub "${AWS::StackName}-private-rt-id"
 
   DMZSecurityGroup:
     Value: !Ref DMZSecurityGroup
     Export:
       Name: !Sub "${AWS::StackName}-dmz-sg"
+  
+  DefaultSecurityGroup:
+    Value: !GetAtt VPC.DefaultSecurityGroup
+    Export:
+      Name: !Sub "${AWS::StackName}-default-sg"
